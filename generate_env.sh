@@ -11,7 +11,7 @@ read -p "Enter _AIRFLOW_WWW_USER_USERNAME (default is 'airflow'): " input_userna
 read -p "Enter _AIRFLOW_WWW_USER_PASSWORD (default is 'airflow'): " input_password
 read -p "Enter _PIP_ADDITIONAL_REQUIREMENTS (default is ''): " input_pip_requirements
 read -p "Enter MLFLOW_BACKEND_STORE_URI (default is 'sqlite:///mlflow.db'): " input_mlflow_backend_store_uri
-read -p "Enter MLFLOW_ARTIFACT_ROOT (default is 'mlruns'): " input_mlflow_default_artifact_root
+read -p "Enter MLFLOW_DEFAULT_ARTIFACT_ROOT (default is 'mlruns'): " input_mlflow_default_artifact_root
 
 # Check if user input is not empty else use default values
 AIRFLOW_UID=${input_uid:=$(id -u)}
