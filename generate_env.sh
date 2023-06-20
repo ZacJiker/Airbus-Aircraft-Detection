@@ -78,7 +78,7 @@ echo -e "${GREEN}[+] File $ENV_FILE created/updated with success${NC}"
 echo ""
 echo -e "${BLUE}[+] Building Docker image $AIRFLOW_IMAGE_NAME...${NC}"
 echo ""
-docker build -t ${AIRFLOW_IMAGE_NAME} . --build-arg KAGGLE_USERNAME=${KAGGLE_USERNAME} --build-arg KAGGLE_KEY=${KAGGLE_KEY}
+docker build -t ${AIRFLOW_IMAGE_NAME} .
 
 # Check if Docker image was built with success
 if [ $? -eq 0 ]; then
