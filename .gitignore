@@ -3,6 +3,13 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Airflow folders
+config/ 
+logs/
+plugins/
+
+.kaggle
+
 # C extensions
 *.so
 
@@ -121,6 +128,7 @@ celerybeat.pid
 
 # Environments
 .env
+.env.bak
 .venv
 env/
 venv/
