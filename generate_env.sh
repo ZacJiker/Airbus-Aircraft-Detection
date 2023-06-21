@@ -47,11 +47,6 @@ echo -e "${BLUE}[+] Pay attention to the following Docker image name.${NC}"
 echo ""
 AIRFLOW_IMAGE_NAME=$(prompt_input "Enter AIRFLOW_IMAGE_NAME" $default_image_name)
 
-# Create Kaggle directory and JSON file for API credentials
-mkdir -p .kaggle
-echo "{\"username\":\"${KAGGLE_USERNAME}\",\"key\":\"${KAGGLE_KEY}\"}" > .kaggle/kaggle.json
-chmod 600 .kaggle/kaggle.json
-
 # If .env file exists then make a backup of it
 if [ -f "$ENV_FILE" ]; then 
     echo ""
@@ -69,6 +64,8 @@ _AIRFLOW_WWW_USER_PASSWORD=$_AIRFLOW_WWW_USER_PASSWORD
 _PIP_ADDITIONAL_REQUIREMENTS=$_PIP_ADDITIONAL_REQUIREMENTS
 MLFLOW_BACKEND_STORE_URI=$MLFLOW_BACKEND_STORE_URI
 MLFLOW_DEFAULT_ARTIFACT_ROOT=$MLFLOW_DEFAULT_ARTIFACT_ROOT
+KAGGLE_USERNAME=$KAGGLE_USERNAME
+KAGGLE_KEY=$KAGGLE_KEY
 EOF
 
 echo ""
@@ -78,7 +75,7 @@ echo -e "${GREEN}[+] File $ENV_FILE created/updated with success${NC}"
 echo ""
 echo -e "${BLUE}[+] Building Docker image $AIRFLOW_IMAGE_NAME...${NC}"
 echo ""
-docker build -t ${AIRFLOW_IMAGE_NAME} .
+docker build -t ${AIRFLOW_IMAGE_NAME} . --build-arg KAGGLE_USERNAME=${KAGGLE_USERNAME} --build-arg KAGGLE_KEY=${KAGGLE_KEY}
 
 # Check if Docker image was built with success
 if [ $? -eq 0 ]; then
