@@ -17,7 +17,7 @@ default_password="airflow"
 default_pip_requirements=""
 default_mlflow_backend_store_uri="sqlite:///mlflow.db"
 default_mlflow_default_artifact_root="mlruns"
-default_image_name="apache/airflow:2.6.1"
+default_image_name="apache/airflow:2.6.1-custom"
 
 # Function to prompt for user input
 prompt_input() {
