@@ -19,6 +19,8 @@ x-airflow-common:
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
     KAGGLE_USERNAME: ${KAGGLE_USERNAME}
     KAGGLE_KEY: ${KAGGLE_KEY}
+    KAGGLE_USERNAME: ${KAGGLE_USERNAME}
+    KAGGLE_KEY: ${KAGGLE_KEY}
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:${AIRFLOW_HOME:-/opt/airflow}/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:${AIRFLOW_HOME:-/opt/airflow}/logs
