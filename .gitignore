@@ -8,6 +8,10 @@ config/
 logs/
 plugins/
 data/
+data/
+
+# Vscode folders
+.vscode/
 
 .kaggle
 
