@@ -34,7 +34,7 @@ with DAG("aircraft_detection_training_dag", default_args=default_args, schedule_
     import torchvision.transforms.v2 as transforms
 
     # Set MLflow tracking URI
-    mlflow.set_tracking_uri("http://mlflow:5000")
+    mlflow.set_tracking_uri("http://localhost:5000")
     # Set experiment name
     mlflow.set_experiment("aircraft_detection")
 
