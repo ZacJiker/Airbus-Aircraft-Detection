@@ -3,6 +3,7 @@ kaggle
 torch
 torchvision
 pillow
-opencv-python
+opencv-python-headless
 scikit-learn
 mlflow
+flask
