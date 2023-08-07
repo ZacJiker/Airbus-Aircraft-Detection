@@ -1,101 +1,74 @@
-import ast  # Import the ast module for abstract syntax tree manipulation
-import pandas as pd  # Import pandas for data manipulation and analysis
-import numpy as np  # Import numpy for numerical computations
-
-from datetime import datetime  # Import datetime module for working with dates and times
-
-from airflow import DAG  # Import the DAG class from Airflow
-from airflow.operators.python import PythonOperator  # Import the PythonOperator class from Airflow
-
-# Function to safely evaluate and parse a string containing a literal Python expression
-def f(x):
-    return ast.literal_eval(x.rstrip('\r\n'))
-
-# Function to calculate bounding box coordinates from a geometry object
-def get_bounds(geometry):
-    try:
-        arr = np.array(geometry).T
-        xmin, ymin = np.min(arr[0]), np.min(arr[1])
-        xmax, ymax = np.max(arr[0]), np.max(arr[1])
-        return (xmin, ymin, xmax, ymax)
-    except:
-        return np.nan
-
-# Functions to calculate width and height from bounding box coordinates
-def get_width(bounds):
-    try:
-        xmin, _, xmax, _ = bounds
-        return np.abs(xmax - xmin)
-    except:
-        return np.nan
-
-def get_height(bounds):
-    try:
-        _, ymin, _, ymax = bounds
-        return np.abs(ymax - ymin)
-    except:
-        return np.nan
-
-# Functions to extract x and y coordinates from bounding box
-def get_x(bounds):
-    try:
-        xmin, _, _, _ = bounds
-        return np.abs(xmin)
-    except:
-        return np.nan
-
-def get_y(bounds):
-    try:
-        _, ymin, _, _ = bounds
-        return np.abs(ymin)
-    except:
-        return np.nan
+from datetime import datetime
+from airflow import DAG
+from airflow.operators.python import PythonOperator
 
 # Define default arguments for the DAG
 default_args = {
-    'owner': 'airflow',
-    'depends_on_past': False,
-    'start_date': datetime(2021, 1, 1),
+    "owner": "airflow", 
+    "depends_on_past": False,
+    "start_date": datetime(2021, 1, 1),
 }
 
 # Create a DAG instance with the given parameters
-with DAG('aircraft_dataset_download_and_preprocess_dag', default_args=default_args, schedule_interval='@daily', catchup=False) as dag:
+with DAG("download_and_preprocess_dag", default_args=default_args, schedule_interval="@daily", catchup=False) as dag:
     
     # Define a function to download the dataset using Kaggle API
-    def download_dataset(dataset, output_path):
-        import kaggle  # Import the kaggle module for interacting with Kaggle API
-        kaggle.api.authenticate()  # Authenticate with Kaggle API
-        kaggle.api.dataset_download_files(dataset, path=output_path, unzip=True)  # Download and unzip the dataset
-    
+    def download_dataset(dataset: str, input_dir: str, unzip: bool, force: bool):
+        import os
+        import kaggle
+        kaggle.api.authenticate()
+        # Create input directory if it does not exist
+        os.makedirs(input_dir, exist_ok=True)
+        # Download dataset files
+        kaggle.api.dataset_download_files(dataset, path=input_dir, unzip=unzip, force=force)
+
     # Create a PythonOperator to execute the dataset download task
     downloading_dataset = PythonOperator(
-        task_id='aircraft_dataset_download',
+        task_id="download_aircraft_dataset",
         python_callable=download_dataset,
         op_kwargs={
-            'dataset': 'airbusgeo/airbus-aircrafts-sample-dataset',
-            'output_path': '/opt/airflow/data/'
-        }
+            "dataset": "airbusgeo/airbus-aircrafts-sample-dataset",
+            "input_dir": "/home/airflow/data",
+            "unzip": True,
+            "force": True,
+        },
     )
 
     # Define a function to preprocess the downloaded dataset
-    def preprocess_dataset(input_path: str, output_path: str):
-        df = pd.read_csv(input_path, converters={'geometry': f, 'class': lambda o: 'airplane'})
-        df.loc[:,'bounds'] = df.loc[:,'geometry'].apply(get_bounds)
-        df.loc[:,'w'] = df.loc[:,'bounds'].apply(get_width)
-        df.loc[:,'h'] = df.loc[:,'bounds'].apply(get_height)
-        df.loc[:,'x'] = df.loc[:,'bounds'].apply(get_x)
-        df.loc[:,'y'] = df.loc[:,'bounds'].apply(get_y)
-        df = df.drop(columns=['geometry', 'bounds'])
-        df.to_csv(output_path, index=False)  # Save the modified DataFrame to a CSV file
-    
+    def preprocess_dataset(input_path, output_path):
+        import ast
+        import pandas as pd
+        import numpy as np
+        # Read the dataset
+        df = pd.read_csv(input_path)
+        # Convert the geometry column from string to dictionary
+        df["geometry"] = df["geometry"].apply(lambda x: ast.literal_eval(x.rstrip('\r\n')))
+        # Rename the class column to lowercase 'airplane'
+        df["class"] = df["class"].apply(lambda x: x.lower())
+        # Define a function to convert the geometry column to bbox
+        def calculate_bbox(coords): 
+            coords = np.array(coords).T
+            return (np.min(coords[0]), np.min(coords[1]), np.max(coords[0]), np.max(coords[1]))
+        # Convert the geometry column to bbox
+        df["bbox"] = df["geometry"].apply(lambda x: calculate_bbox(x))
+        # Create the width, height, x, y columns
+        df["width"] = df["bbox"].apply(lambda coords: coords[2] - coords[0])
+        df["height"] = df["bbox"].apply(lambda coords: coords[3] - coords[1])
+        df["x"] = df["bbox"].apply(lambda coords: coords[0])
+        df["y"] = df["bbox"].apply(lambda coords: coords[1])
+        # Drop the geometry column
+        df = df.drop(columns=["geometry"])
+        # Save the preprocessed dataset
+        df.to_csv(output_path, index=False)
+
     # Create a PythonOperator to execute the dataset preprocessing task
     preprocessing_dataset = PythonOperator(
-        task_id='aircraft_dataset_preprocessing',
+        task_id="preprocess_aircraft_dataset",
         python_callable=preprocess_dataset,
         op_kwargs={
-            'input_path': '/opt/airflow/data/annotations.csv',
-            'output_path': '/opt/airflow/data/annotations.csv'
-        }
+            "input_path": "/home/airflow/data/annotations.csv",
+            "output_path": "/home/airflow/data/annotations.csv",
+        },
     )
 
     # Set the task dependencies: downloading_dataset must run before preprocessing_dataset
