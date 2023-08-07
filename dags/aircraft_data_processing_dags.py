@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 
@@ -6,7 +6,9 @@ from airflow.operators.python import PythonOperator
 default_args = {
     "owner": "airflow", 
     "depends_on_past": False,
-    "start_date": datetime(2021, 1, 1),
+    "start_date": datetime(2023, 8, 7),
+    "retries": 1,
+    "retry_delay": timedelta(minutes=5),
 }
 
 # Create a DAG instance with the given parameters
