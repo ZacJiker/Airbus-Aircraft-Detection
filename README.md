@@ -1,57 +1,58 @@
-# Aircraft Detection (using Airbus Dataset)
+# Aircraft Detection Using Airbus Dataset
 
-Aircrafts are usually seen on airports. Earth observation satellites like Airbus' Pleiades twin satellites acquire pictures of airports all over the world on a regular basis. Deep Learning can be used to detect automatically the number, size and type of aircrafts present on the site. In turn, this can provide information about the activity of any airport.
+Aircraft are frequently observed at airports around the world. Earth observation satellites, such as Airbus' Pleiades twin satellites, capture images of airports regularly. Deep Learning techniques can be leveraged to automatically detect and identify aircraft in these images, providing insights into airport activity by determining the number, size, and type of aircraft present.
 
-End-to-end machine learning pipeline for Airbus aircraft detection using Airflow, Docker, and MLFlow. The pipeline is based on the [Airbus Aircraft Detection Kaggle Competition](hhttps://www.kaggle.com/datasets/airbusgeo/airbus-aircrafts-sample-dataset). The pipeline is divided into 4 stages:
+This documentation outlines an end-to-end machine learning pipeline for detecting Airbus aircraft using Airflow, Docker, and MLFlow. The pipeline is built upon the [Airbus Aircraft Detection Kaggle Competition](https://www.kaggle.com/datasets/airbusgeo/airbus-aircrafts-sample-dataset) dataset and comprises four key stages:
 
 1. Data Downloading
 2. Data Preprocessing
-3. Training
-4. Serving
+3. Model Training
+4. Model Serving
 
-After the training stage, the model will be saved in the MLFlow models registry. The model can be used for inference. You can use the web app to test the model at `http://localhost:8501/`.
+Upon completion of the training stage, the resulting model is saved in the MLFlow models registry and can be used for inference. A web app is also provided for model testing, accessible at `http://localhost:8501/`.
 
-## Pay Attention
+## Important Notes
 
-You need a Kaggle account to download the dataset. You can create a Kaggle account [here](https://www.kaggle.com/account/login?phase=startRegisterTab&returnUrl=%2F). And, you need to create a Kaggle API token. You can create a Kaggle API token [here](https://www.kaggle.com/docs/api#getting-started-installation-&-authentication).
+To successfully utilize this pipeline, please ensure the following:
 
-## Getting Started (From Local)
+- You possess a Kaggle account to download the required dataset. If not, you can create one [here](https://www.kaggle.com/account/login?phase=startRegisterTab&returnUrl=%2F).
+- A Kaggle API token is necessary. You can generate one [here](https://www.kaggle.com/docs/api#getting-started-installation-&-authentication).
 
-For running the pipeline, you need to install the following dependencies: 
+## Getting Started (Local Deployment)
+
+To run the pipeline locally, ensure you have the following dependencies installed:
 
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
 ### Launching the Pipeline
 
-1. Clone the repository
+1. Clone the repository:
 
-```
+```bash
 git clone https://github.com/ZacJiker/Airbus-Aircraft-Detection
 ```
 
-2. Build the Docker image of custom airflow
+2. Generate the `.env` file:
 
-```
-docker build -t apache/airflow:2.6.1-custom .
-```
-
-3. Generate the `.env` file
-
-```
+```bash
 bash scripts/generate_env.sh
 ```
 
-4. Start the containers
+3. Build the custom Airflow Docker image:
 
+```bash
+docker build -t apache/airflow:2.6.1-custom .
 ```
+
+4. Start the containers:
+
+```bash
 docker-compose up -d
 ```
 
-If used docker compose in version 2.0, you can use the following command:
+**Please allow a few minutes for initialization. You can access the Airflow UI at http://localhost:8080/ and the MLFlow UI at http://localhost:5000/. From here, you can execute the DAGs within the Airflow UI.**
 
-```
-docker-compose up -d
-```
+## Conclusion 
 
-**Wait for a few minutes, then you can access the Airflow UI at `http://localhost:8080/` and MLFlow UI at `http://localhost:5000/`. After, you can run the DAGs in the Airflow UI.**
+This documentation provides you with a comprehensive overview of setting up an end-to-end aircraft detection pipeline using the Airbus Dataset. By leveraging Deep Learning, Airflow, Docker, and MLFlow, you can efficiently preprocess data, train a model, and deploy it for inference. Analyzing airport activity through aircraft detection becomes both automated and insightful with this powerful pipeline.
