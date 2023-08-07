@@ -9,6 +9,9 @@ logs/
 plugins/
 data/
 
+# Vscode folders
+.vscode/
+
 .kaggle
 
 # C extensions
