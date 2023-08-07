@@ -52,8 +52,8 @@ with DAG("download_and_preprocess_dag", default_args=default_args, schedule_inte
         # Convert the geometry column to bbox
         df["bbox"] = df["geometry"].apply(lambda x: calculate_bbox(x))
         # Create the width, height, x, y columns
-        df["width"] = df["bbox"].apply(lambda coords: coords[2] - coords[0])
-        df["height"] = df["bbox"].apply(lambda coords: coords[3] - coords[1])
+        df["w"] = df["bbox"].apply(lambda coords: coords[2] - coords[0])
+        df["h"] = df["bbox"].apply(lambda coords: coords[3] - coords[1])
         df["x"] = df["bbox"].apply(lambda coords: coords[0])
         df["y"] = df["bbox"].apply(lambda coords: coords[1])
         # Drop the geometry column
